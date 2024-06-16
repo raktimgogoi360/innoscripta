@@ -1,0 +1,41 @@
+{
+  "name": "innoscripta",
+  "version": "1.0.0",
+  "description": "This is an test assignment for Innoscripta AG . Aim is to build a system that can authenticate through gmail and can sent mail through SMTP and imap method to receive email. For more details please refer to ReadMe.md file.",
+  "main": "index.js",
+  "scripts": {
+    "test": "test",
+    "start": "index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/raktimgogoi360/innoscripta.git"
+  },
+  "keywords": [
+    "innoscripta",
+    "nodemailer",
+    "imap",
+    "raktim",
+    "gogoi",
+    "test",
+    "code",
+    "Oauth"
+  ],
+  "author": "Raktim Gogoi",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/raktimgogoi360/innoscripta/issues"
+  },
+  "homepage": "https://github.com/raktimgogoi360/innoscripta#readme",
+  "dependencies": {
+    "@elastic/elasticsearch": "^8.13.1",
+    "body-parser": "^1.20.2",
+    "dotenv": "^16.4.5",
+    "elasticsearch": "^16.7.3",
+    "express": "^4.19.2",
+    "node-fetch": "^3.3.2",
+    "nodemailer": "^6.9.13",
+    "nodemon": "^3.1.3",
+    "oauth2": "^0.0.1"
+  }
+}
