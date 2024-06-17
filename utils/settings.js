@@ -12,7 +12,8 @@ function settings() {
             client_id: environVariables.CLIENT_ID_OUTLOOK,
             client_secret: environVariables.CLIENT_SECRET_OUTLOOK,
             tenant_id: environVariables.TENANT_ID_OUTLOOK,
-            rediect_url: environVariables.REDIRECT_URI_OUTLOOK
+            rediect_url: environVariables.REDIRECT_URI_OUTLOOK,
+            identityMetadata : environVariables.IDENTITY_META_DATA
         }
 
     }
@@ -22,9 +23,11 @@ function settings() {
             client_id: environVariables.CLIENT_ID_GMAIL,
             client_secret: environVariables.CLIENT_SECRET_GMAIL,
             rediect_url: environVariables.REDIRECT_URI_GMAIL
+            
         }
     }
-    console.log("settings config"  , config)
+    config["PORT"] = environVariables.PORT;
+    config["ELASTICSEARCH"] = environVariables.ELASTICSEARCH
     return (config)
 }
 
