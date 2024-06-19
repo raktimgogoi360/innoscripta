@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Email List</title>
+    <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th,
+        td {
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+        }
+
+        th {
+            background-color: #f4f4f4;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Email List</h1>
+    <table id="emailTable">
+        <thead>
+            <tr>
+                <th>Sender's Name</th>
+                <th>Sender's Email Address</th>
+                <th>Subject</th>
+                <th>Received Date</th>
+                <th>Body</th>
+                <th>Read</th>
+            </tr>
+        </thead>
+        <tbody>
+        </tbody>
+    </table>
+
+    <script>
+        let lastReceivedDateTime = null;
+
+        async function fetchEmails() {
+            const response = await fetch('/fetchMails');
+            const emails = await response.json();
+            const tableBody = document.querySelector('#emailTable tbody');
+
+            emails.forEach(email => {
+                const receivedDateTime = new Date(email.receivedDateTime).toISOString();
+                console.log("receive date time : ", receivedDateTime);
+                console.log("last received date : ", lastReceivedDateTime)
+                if (!lastReceivedDateTime || receivedDateTime > lastReceivedDateTime) {
+                    lastReceivedDateTime = receivedDateTime;
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                    <td>${email.name}</td> 
+                    <td>${email.from}</td>    
+                    <td>${email.subject}</td>
+                        <td>${new Date(email.receivedDateTime).toLocaleString()}</td>
+                        <td>${email.bodyPreview}</td>
+                        <td>${email.isRead}</td>
+                    `;
+                    console.log(row.innerHTML)
+                    tableBody.appendChild(row);
+                }
+            });
+        }
+
+        setInterval(fetchEmails, 10000); // Fetch new emails every 5 seconds
+
+        document.addEventListener('DOMContentLoaded', fetchEmails);
+    </script>
+</body>
+
+</html>

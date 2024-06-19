@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Innoscripta Project Backend</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="parentDiv">
+        <div id="child-left">
+            <button id="redirectButton"  class="button" type="button" class="btn btn-primary">Login with Microsoft Account</button>
+
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('redirectButton').addEventListener('click', function() {
+            window.location.href = '/auth';
+        });
+    </script>
+</body>
+</html>
