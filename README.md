@@ -42,5 +42,21 @@
 
 ## Environment Variables
 
-Create a `.env` file in the root of your project and add the following environment variables:
+Create a `.env` file in the root of your project if runnung through git clone , if creating a a docker container then this step is not requied and skip this step.
 
+
+```yaml
+- MONGO_URI=mongodb://mongo:27017
+- CLIENT_SECRET=<change here>
+- CLIENT_ID=<change here>
+- TENANT_ID=<change here>
+- REDIRECT_URI=http://localhost:3000/auth/outlook/callback
+
+### If you are running the project through Docker, then change the client secret, client ID, and Tenant ID in the `docker-compose.yml` file. Example given below : (the `MONGO_URI` and `Redirect URL` should not be changed):
+
+```yaml
+- MONGO_URI=mongodb://mongo:27017
+- CLIENT_SECRET=<change here>
+- CLIENT_ID=<change here>
+- TENANT_ID=<change here>
+- REDIRECT_URI=http://localhost:3000/auth/outlook/callback
