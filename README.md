@@ -5,7 +5,7 @@
 - **Node.js**: Ensure you have Node.js installed. You can download it from [Node.js official site](https://nodejs.org/).
 - **MongoDB**: Ensure you have MongoDB installed and running. Alternatively, you can use a cloud MongoDB service like [MongoDB Atlas](https://www.mongodb.com/cloud/atlas).
 - **Azure Subscription**: You need an Azure subscription to set up Azure Active Directory.
-- 
+
 ### Clone this project innoscripta.
 
 - Commnad : gh repo clone raktimgogoi360/innoscripta
