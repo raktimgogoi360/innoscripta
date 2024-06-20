@@ -46,7 +46,7 @@
 
 ## Environment Variables
 
-Create a `.env` file in the root of your project if running through git clone, if creating a a docker container then this step is not required, and skip this step.
+Create a `.env` file in the root of your project if running through git clone, if creating a docker container then this step is not required, and skip this step.
 
 
 ```yaml
@@ -74,7 +74,9 @@ Create a `.env` file in the root of your project if running through git clone, i
 2. Create a .env file and fill in the details mentioned above or just take the refference of the .envExample file and change the required details.
 3. After successful installation run the command:
 - npm start
-##### If the server is started , then run localhost:3000 in broser and login .
+##### If the server is started , then run localhost:3000 in browser and login .
+
+# OR
 
 ### Step 2: Through docker container.
 1. Edit the environemnt varables in docker-compose.yml file as stated above.
