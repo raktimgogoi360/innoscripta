@@ -8,7 +8,7 @@
 
 ### Clone this project innoscripta.
 
-- Command cmd in the path desired where we want to clone the project and run commnad : gh repo clone raktimgogoi360/innoscripta
+- Open cmd in the path desired where we want to clone the project and run commnad : gh repo clone raktimgogoi360/innoscripta
 
 ## Setup in Azure Active Directory
 
@@ -42,11 +42,11 @@
 1. Go to **"Certificates & secrets"** in your app registration.
 2. Click **"New client secret"**.
 3. Add a description and set an expiration period.
-4. Click **"Add"** and copy the client secret value (you will need this for your environment variables).
+4. Click **"Add"** and copy the client secret value (copy the secret id and paste it somewhere. We will need this for our environment variables).
 
 ## Environment Variables
 
-Create a `.env` file in the root of your project if runnung through git clone , if creating a a docker container then this step is not requied and skip this step.
+Create a `.env` file in the root of your project if running through git clone, if creating a a docker container then this step is not required, and skip this step.
 
 
 ```yaml
@@ -58,7 +58,7 @@ Create a `.env` file in the root of your project if runnung through git clone , 
 ```
 
 ### If you are running the project through Docker, then change the client secret, client ID, and Tenant ID in the `docker-compose.yml` file. Example given below : (the `MONGO_URI` and `Redirect URL` should not be changed):
-
+1. Delete the .env file, if created and instead add the following details in the docker-compose.yml file.
 ```yaml
 - MONGO_URI=mongodb://mongo:27017
 - CLIENT_SECRET=<change here>
@@ -78,8 +78,15 @@ Create a `.env` file in the root of your project if runnung through git clone , 
 
 ### Step 2: Through docker container.
 1. Edit the environemnt varables in docker-compose.yml file as stated above.
-2. Run the command: `docker-compose up`. This will create an image and start a server.
-3. Once the server is up, we go to browser and run command : `localhost:3000`. 
+2. Delete the .env file if running through docker.
+3. Run the command: `docker-compose up`. This will create an image and start a server.
+4. Once the server is up, we go to the browser and run command: `localhost:3000`.
+
+
+### After successfully authenticated, we will see emails something like this : 
+
+![image](https://github.com/raktimgogoi360/innoscripta/assets/36370301/870afd71-1076-4750-85e7-2c7c1dec1e9b)
+
 
 
 
