@@ -1,0 +1,28 @@
+version: '3.8'
+
+services:
+  mongo:
+    image: mongo:4.4
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
+
+  app:
+    build: .
+    container_name: nodejs-app
+    ports:
+      - "3000:3000"
+    environment:
+      - MONGO_URI=mongodb://mongo:27017
+      - CLIENT_SECRET=9.28Q~Qsustb-Z-NJBXLr1qGBW.uLa.A~Pa8naOS
+      - CLIENT_ID=25ee1fc1-3379-4148-ab39-c4c24688d158
+      - TENANT_ID=150c22a5-d8bb-4616-aac7-65d9aa780839
+      - REDIRECT_URI=http://localhost:3000/auth/outlook/callback
+    depends_on:
+      - mongo
+    volumes:
+      - .:/usr/src/app
+
+volumes:
+  mongo-data:

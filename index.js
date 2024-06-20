@@ -17,7 +17,7 @@ app.use(bodyParser.json());
 
 //express to use public folder
 app.use(express.static(path.join(__dirname, 'public')));
-
+console.log(process.env)
 // Configure passport Azure AD
 passport.use(new BearerStrategy({
     identityMetadata: `https://login.microsoftonline.com/${process.env.TENANT_ID}/v2.0/.well-known/openid-configuration`,
