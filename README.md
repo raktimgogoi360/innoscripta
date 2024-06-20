@@ -83,9 +83,22 @@ Create a `.env` file in the root of your project if running through git clone, i
 4. Once the server is up, we go to the browser and run command: `localhost:3000`.
 
 
-### After successfully authenticated, we will see emails something like this : 
+### After successfully setup, we will see emails something like this : 
+1. Login :
+
+ ![image](https://github.com/raktimgogoi360/innoscripta/assets/36370301/72673e65-5356-4154-8313-41c188ebdf68)
+
+2. Select Authentication theough Microsoft account that has permissons :
+
+ ![image](https://github.com/raktimgogoi360/innoscripta/assets/36370301/32fef6ac-be22-479f-83e5-3e7931adeac3)
+
+3. After successfull signup, we will get the below UI for displaying the emails :
 
 ![image](https://github.com/raktimgogoi360/innoscripta/assets/36370301/870afd71-1076-4750-85e7-2c7c1dec1e9b)
+
+
+
+# Happy coding !!! Fell free to reachout to me in case of any queries at `raktimgogoi360@gmail.com`
 
 
 
