@@ -5,6 +5,10 @@
 - **Node.js**: Ensure you have Node.js installed. You can download it from [Node.js official site](https://nodejs.org/).
 - **MongoDB**: Ensure you have MongoDB installed and running. Alternatively, you can use a cloud MongoDB service like [MongoDB Atlas](https://www.mongodb.com/cloud/atlas).
 - **Azure Subscription**: You need an Azure subscription to set up Azure Active Directory.
+- 
+### Clone this project innoscripta.
+
+- Commnad : gh repo clone raktimgogoi360/innoscripta
 
 ## Setup in Azure Active Directory
 
@@ -62,3 +66,22 @@ Create a `.env` file in the root of your project if runnung through git clone , 
 - TENANT_ID=<change here>
 - REDIRECT_URI=http://localhost:3000/auth/outlook/callback
 ```
+
+## Now that the basic setup is completed, run the project through Docker or through clone directory method.
+
+### Step 1 : Through local machine.
+1. In the root directory , do npm i.
+2. Create a .env file and fill in the details mentioned above or just take the refference of the .envExample file and change the required details.
+3. After successful installation run the command:
+- npm start
+##### If the server is started , then run localhost:3000 in broser and login .
+
+### Step 2: Through docker container.
+1. Edit the environemnt varables in docker-compose.yml file as stated above.
+2. Run the command: `docker-compose up`. This will create an image and start a server.
+3. Once the server is up, we go to browser and run command : `localhost:3000`. 
+
+
+
+
+
