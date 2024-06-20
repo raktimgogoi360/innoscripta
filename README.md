@@ -51,6 +51,7 @@ Create a `.env` file in the root of your project if runnung through git clone , 
 - CLIENT_ID=<change here>
 - TENANT_ID=<change here>
 - REDIRECT_URI=http://localhost:3000/auth/outlook/callback
+```yaml
 
 ### If you are running the project through Docker, then change the client secret, client ID, and Tenant ID in the `docker-compose.yml` file. Example given below : (the `MONGO_URI` and `Redirect URL` should not be changed):
 
@@ -60,3 +61,4 @@ Create a `.env` file in the root of your project if runnung through git clone , 
 - CLIENT_ID=<change here>
 - TENANT_ID=<change here>
 - REDIRECT_URI=http://localhost:3000/auth/outlook/callback
+```yaml
