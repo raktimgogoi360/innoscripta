@@ -8,7 +8,7 @@
 
 ### Clone this project innoscripta.
 
-- Commnad : gh repo clone raktimgogoi360/innoscripta
+- Command cmd in the path desired where we want to clone the project and run commnad : gh repo clone raktimgogoi360/innoscripta
 
 ## Setup in Azure Active Directory
 
