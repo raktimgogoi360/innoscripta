@@ -64,7 +64,7 @@ app.get('/auth/outlook/callback', async (req, res, next) => {
         let accessToken = response.data.access_token;
         let refresh_token = response.data.refresh_token;
         let dbName = "users";
-        let collection = "AuthDetails";
+        let collection = "auth_details";
         let where = {
             "tenent_ID": process.env.TENANT_ID
         }
@@ -104,7 +104,7 @@ app.get('/emails', (req, res, next) => {
                 console.log("Got profile response")
                 let user = response.data || '';
                 let dbName = 'users';
-                let collection = 'UserDetails';
+                let collection = 'user_details';
                 let where = {
                     "email": user.mail
                 };
