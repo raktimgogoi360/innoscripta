@@ -114,7 +114,7 @@ app.get('/emails', async (req, res, next) => {
                     "id": user.id,
                     "email": user.mail
                 }
-                await mongoAction.update(dbName, collection, where, update);
+              //  await mongoAction.update(dbName, collection, where, update);
                 await elasticOperation.updateDocument(collection, user.mail, update, upsert = true)
             })
             .catch((e) => {
@@ -192,13 +192,17 @@ app.get('/fetchMails', async (req, res, next) => {
                         "from": mailData[i].from.emailAddress.address,
                         "name": mailData[i].from.emailAddress.name,
                         "folder": mailData[i].Folder
-
-
                     };
-                    await elasticOperation.updateDocument(collection,  update, upsert = true)
+                    await elasticOperation.updateDocument(collection, mailData[i].id+mailData[i].Folder, update, upsert = true)
                     //await mongoAction.update(dbName, collection, where, update)
                 }
-                var sort = { receivedDateTime: 1 }
+                var sort = [
+                    {
+                      ["receivedDateTime"]: {
+                        order: "asc"
+                      }
+                    }
+                  ]
                 //fetch emails using mongodb
                 //const emails = await mongoAction.fetch(dbName, collection, {}, sort);
                 let query = {
@@ -206,9 +210,14 @@ app.get('/fetchMails', async (req, res, next) => {
                         match_all: {}
                       }
                 }
-             let emails = await elasticOperation.fetch(collection, query)
+                
+             let emails = await elasticOperation.searchDocuments(collection, query,sort);
+             let renderData = [];
+             emails.forEach((ele)=>{
+                renderData.push(ele._source)
+             })
 console.log("This is the email fetched using elastic seatch");
-                res.json(emails)
+                res.json(renderData)
 
             })
             .catch(error => {
