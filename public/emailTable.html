@@ -34,6 +34,7 @@
                 <th>Received Date</th>
                 <th>Body</th>
                 <th>Read</th>
+                <th>Folder</th>
             </tr>
         </thead>
         <tbody>
@@ -42,7 +43,6 @@
 
     <script>
         let lastReceivedDateTime = null;
-
         async function fetchEmails() {
             const response = await fetch('/fetchMails');
             const emails = await response.json();
@@ -62,6 +62,7 @@
                         <td>${new Date(email.receivedDateTime).toLocaleString()}</td>
                         <td>${email.bodyPreview}</td>
                         <td>${email.isRead}</td>
+                         <td>${email.folder}</td>
                     `;
                     console.log(row.innerHTML)
                     tableBody.appendChild(row);
