@@ -3,7 +3,7 @@
 ## Prerequisites
 
 - **Node.js**: Ensure you have Node.js installed. You can download it from [Node.js official site](https://nodejs.org/).   (**VERSION 16 is required to run this project**)
-- **MongoDB**: Ensure you have MongoDB installed and running. Alternatively, you can use a cloud MongoDB service like [MongoDB Atlas](https://www.mongodb.com/cloud/atlas).
+- **ElasticSearch**: Ensure you have ElasticSearch installed and running if running from local system.
 - **Azure Subscription**: You need an Azure subscription to set up Azure Active Directory.
 
 ### Clone this project innoscripta.
@@ -19,7 +19,7 @@
 3. Click **"New registration"**.
 4. Enter a name for the application (e.g., EmailFetcher).
 5. Set **"Supported account types"** to **"Accounts in this organizational directory only"**.
-6. Set the **"Redirect URI"** to `http://localhost:3000/auth/outlook/callback`.
+6. Set the **"Redirect URI"** to `http://localhost:3000/auth/outlook/callback`. This rediect URL should not be changed as the same route is used in code.
 7. Click **"Register"**.
 
 ### Configure API Permissions:
@@ -50,21 +50,31 @@ Create a `.env` file in the root of your project if running through git clone, i
 
 
 ```yaml
-- MONGO_URI=mongodb://mongo:27017
-- CLIENT_SECRET=<change here>
-- CLIENT_ID=<change here>
-- TENANT_ID=<change here>
-- REDIRECT_URI=http://localhost:3000/auth/outlook/callback
+ENVIRONMENT = DEV
+BASE_URL = https://localhost:3000
+PORT =3000
+
+###################ElasticSearch Details ################
+ELASTIC_SEARCH_URI = http://elasticsearch:9200
+#ELASTIC_SEARCH_URI = http://<username>:<password>@elasticsearch:9200 (use this if password is enabled)
+
+###########Azure Details #########3
+CLIENT_SECRET = <secret id>
+CLIENT_ID = <client id>
+TENANT_ID= <tenent id>
+REDIRECT_URI= http://localhost:3000/auth/outlook/callback
+
 ```
 
-### If you are running the project through Docker, then change the client secret, client ID, and Tenant ID in the `docker-compose.yml` file. Example given below : (the `MONGO_URI` and `Redirect URL` should not be changed):
+### If you are running the project through Docker, then change the client secret, client ID, and Tenant ID in the `docker-compose.yml` file. Example given below : (the `ELASTIC_SEARCH_URI` and `Redirect URL` should not be changed):
 1. Delete the .env file, if created and instead add the following details in the docker-compose.yml file.
 ```yaml
-- MONGO_URI=mongodb://mongo:27017
-- CLIENT_SECRET=<change here>
-- CLIENT_ID=<change here>
-- TENANT_ID=<change here>
-- REDIRECT_URI=http://localhost:3000/auth/outlook/callback
+ - PORT=3000
+      - CLIENT_ID=<secret id>
+      - CLIENT_SECRET=<tenent id>
+      - TENANT_ID= <tenent id>
+      - REDIRECT_URI=http://localhost:3000/auth/outlook/callback
+      - ELASTIC_SEARCH_URI=http://elasticsearch:9200
 ```
 
 ## Now that the basic setup is completed, run the project through Docker or through clone directory method.
@@ -96,7 +106,7 @@ Create a `.env` file in the root of your project if running through git clone, i
 
 3. After successfull signup, we will get the below UI for displaying the emails :
 
-![image](https://github.com/raktimgogoi360/innoscripta/assets/36370301/870afd71-1076-4750-85e7-2c7c1dec1e9b)
+![image](https://github.com/raktimgogoi360/innoscripta/assets/36370301/0c629ae3-ee1d-4c33-b290-61e10564aecb)
 
 
 
