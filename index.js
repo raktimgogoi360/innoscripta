@@ -1,46 +1,32 @@
 require('dotenv').config();
 const express = require('express');
-const passport = require('passport');
-const { BearerStrategy } = require('passport-azure-ad');
 const axios = require('axios');
 const querystring = require('querystring');
 const path = require('path');
 const bodyParser = require('body-parser');
-const mongoAction = require('./lib/adapter');
-const elasticOperation = require('./lib/ElasticSearch');
-
+const elasticOperation = require('./lib/ElasticSearch'); // Elasticsearch operations
+var refreshAccessToken = require("./utils/refreshToken")
 const port = process.env.PORT || 3000;
 
 const app = express();
 app.use(bodyParser.json());
 
-//handle error so that server doesnot crash
+// Error handling middleware to prevent server crashes
 app.use((err, req, res, next) => {
     console.error('Error caught:', err);
     res.redirect('/error');
 });
 
-//express to use public folder
+// Serve static files from the public folder
 app.use(express.static(path.join(__dirname, 'public')));
-console.log(process.env)
-// Configure passport Azure AD
-passport.use(new BearerStrategy({
-    identityMetadata: `https://login.microsoftonline.com/${process.env.TENANT_ID}/v2.0/.well-known/openid-configuration`,
-    clientID: process.env.CLIENT_ID,
-    validateIssuer: true,
-    loggingLevel: 'info',
-    passReqToCallback: false
-}, (token, done) => {
-    done(null, token);
-}));
 
-app.use(passport.initialize());
-
+// Redirect to Microsoft OAuth2 authorization endpoint
 app.get('/auth', (req, res) => {
     const authUrl = `https://login.microsoftonline.com/${process.env.TENANT_ID}/oauth2/v2.0/authorize?client_id=${process.env.CLIENT_ID}&response_type=code&redirect_uri=${process.env.REDIRECT_URI}&response_mode=query&scope=openid profile offline_access email Mail.Read`;
     res.redirect(authUrl);
 });
 
+// Callback endpoint for OAuth2 authentication
 app.get('/auth/outlook/callback', async (req, res, next) => {
     const code = req.query.code;
     const params = querystring.stringify({
@@ -56,184 +42,171 @@ app.get('/auth/outlook/callback', async (req, res, next) => {
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded'
             }
-        })
-            .catch((e) => {
-                console.log("Caught error while fetching access token", e);
-                res.json(e);
-            })
-        let accessToken = response.data.access_token;
-        let refresh_token = response.data.refresh_token;
-        let dbName = "users";
-        let collection = "auth_details";
-        let where = {
-            "tenent_ID": process.env.TENANT_ID
-        }
+        });
 
-        let update = {
-            "tenent_ID": process.env.TENANT_ID,
-            "refresh_token": refresh_token,
-            "accessToken": accessToken
-        }
-        //elastic operation to update the auth details
-        await elasticOperation.updateDocument(collection, where.tenent_ID, update, upsert = true)
-        //mongo operation to update  auth details in DB
-        //await mongoAction.update(dbName, collection, where, update)
-        console.log("**********Got aaccess_token from API ***************\n")
+        const { access_token: accessToken, refresh_token: refreshToken } = response.data;
+
+        const update = {
+            tenent_ID: process.env.TENANT_ID,
+            refresh_token: refreshToken,
+            accessToken: accessToken
+        };
+
+        // Upsert auth details into Elasticsearch
+        await elasticOperation.updateDocument('auth_details', process.env.TENANT_ID, update, true);
+
+        console.log("**********Got access_token from API ***************\n");
         res.redirect(`/emails?access_token=${accessToken}`);
     } catch (error) {
-        next(error)
+        console.log("Caught error while fetching access token", error);
+        next(error);
     }
 });
+
+// Serve the home page
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'home.html'));
-
 });
 
-//get emails
+// Fetch emails using the provided access token
 app.get('/emails', async (req, res, next) => {
     const accessToken = req.query.access_token;
     if (!accessToken) {
         return res.status(401).send('Access token is missing');
     }
+
     try {
-        axios.get('https://graph.microsoft.com/v1.0/me', {
+        const response = await axios.get('https://graph.microsoft.com/v1.0/me', {
             headers: {
                 Authorization: `Bearer ${accessToken}`
             }
-        })
-            .then(async (response) => {
-                console.log("Got profile response")
-                let user = response.data || '';
-                let dbName = 'users';
-                let collection = 'user_details';
-                let where = {
-                    "email": user.mail
-                };
-                let update = {
-                    "user": user,
-                    "id": user.id,
-                    "email": user.mail
-                }
-              //  await mongoAction.update(dbName, collection, where, update);
-                await elasticOperation.updateDocument(collection, user.mail, update, upsert = true)
-            })
-            .catch((e) => {
-                console.log("Error in getting response, ", e);
-                next(e)
-            })
-    } catch (error) {
-        console.log("Error in getting response, ", error);
-        next(error)
-    }
+        });
 
-    res.sendFile(path.join(__dirname, 'public', 'emailTable.html'));
+        const user = response.data;
+        const update = {
+            user: user,
+            id: user.id,
+            email: user.mail
+        };
+
+        // Upsert user details into Elasticsearch
+        await elasticOperation.updateDocument('user_details', user.mail, update, true);
+
+        res.sendFile(path.join(__dirname, 'public', 'emailTable.html'));
+    } catch (error) {
+        console.log("Error in getting response,", error);
+        next(error);
+    }
 });
 
-
+// Fetch and update email folders and messages
 app.get('/fetchMails', async (req, res, next) => {
-    let whereClause = { "tenent_ID": process.env.TENANT_ID };
-    let dbName = 'users';
-    let collection = "auth_details"
-    let data = await mongoAction.fetch(dbName, collection, whereClause, {});
-    var accessToken = data[0]["accessToken"];
-
     try {
-        let mailFolder = await axios.get('https://graph.microsoft.com/v1.0/me/mailFolders', {
-            headers: {
-                Authorization: `Bearer ${accessToken}`
-            }
-        })
-            .catch((e) => {
-                console.log("Error in fetching email folders", e);
-                next(e);
-            })
-        console.log(mailFolder);
-        mailFolder = mailFolder && mailFolder.data && mailFolder.data.value ? mailFolder.data.value : [];
-        for (var i = 0; i < mailFolder.length; i++) {
-            mailFolder[i]['displayName'] = mailFolder[i]["displayName"].toLowerCase().replace(/\s+/g, '_')
-            let collection = mailFolder[i]["displayName"];
-            let id = mailFolder[i].id;
-            let update = mailFolder[i];
-            let output = await elasticOperation.updateDocument(collection, id, update, upsert = true);
-            console.log(output)
+        const authData = await elasticOperation.searchDocumentById('auth_details', process.env.TENANT_ID);
+        let accessToken = authData.accessToken;
+        const refreshToken = authData.refresh_token;
 
+        // Fetch email folders
+         try {
+            var folderResponse = await axios.get('https://graph.microsoft.com/v1.0/me/mailFolders', {
+                headers: {
+                    Authorization: `Bearer ${accessToken}`
+                }
+            });
+        } catch (tokenError) {
+            // If token is invalid or expired, refresh it
+            if (tokenError.response && tokenError.response.status === 401) {
+                console.log("Access token expired, refreshing token...");
+                accessToken = await refreshAccessToken(refreshToken);
+                var folderResponse = await axios.get('https://graph.microsoft.com/v1.0/me/mailFolders', {
+                    headers: {
+                        Authorization: `Bearer ${accessToken}`
+                    }
+                });
+            } else {
+                throw tokenError;
+            }
         }
 
-        axios.get('https://graph.microsoft.com/v1.0/me/messages', {
-            headers: {
-                Authorization: `Bearer ${accessToken}`
-            }
-        })
-            .then(async (response) => {
-                mailFolder
-                let mailData = response && response.data && response.data.value ? response.data.value : [];
-                mailData = mailData.map(mail => {
-                    const folder = mailFolder.find(f => f.id == mail.parentFolderId);
-                    return {
-                        ...mail,
-                        Folder: folder ? folder.displayName : null
-                    };
-                });
+        let mailFolders = folderResponse.data.value || [];
+        mailFolders = await Promise.all(mailFolders.map(async (folder) => {
+            folder.displayName = folder.displayName.toLowerCase().replace(/\s+/g, '_');
+            await elasticOperation.updateDocument(folder.displayName, folder.id, folder, true);
+            return folder;
+        }));
 
-                let dbName = "mailInfo";
-                let collection = "mails";
-                for (var i = 0; i < mailData.length; i++) {
-                    let where = { "bodyPreview": mailData[i].bodyPreview,
-                        "subject": mailData[i].subject,
-                     };
-                    let update = {
-                        "id": mailData[i].id+mailData[i].Folder,
-                        "subject": mailData[i].subject,
-                        "createdDateTime": mailData[i].createdDateTime,
-                        "lastModifiedDateTime": mailData[i].lastModifiedDateTime,
-                        "bodyPreview": mailData[i].bodyPreview,
-                        "isRead": mailData[i].isRead,
-                        "receivedDateTime": mailData[i].receivedDateTime,
-                        "from": mailData[i].from.emailAddress.address,
-                        "name": mailData[i].from.emailAddress.name,
-                        "folder": mailData[i].Folder
-                    };
-                    await elasticOperation.updateDocument(collection, mailData[i].id+mailData[i].Folder, update, upsert = true)
-                    //await mongoAction.update(dbName, collection, where, update)
+        // Fetch all emails
+        let mailData = [];
+        let nextLink = 'https://graph.microsoft.com/v1.0/me/messages';
+        while (nextLink) {
+            const response = await axios.get(nextLink, {
+                headers: {
+                    Authorization: `Bearer ${accessToken}`
                 }
-                var sort = [
-                    {
-                      ["receivedDateTime"]: {
-                        order: "asc"
-                      }
-                    }
-                  ]
-                //fetch emails using mongodb
-                //const emails = await mongoAction.fetch(dbName, collection, {}, sort);
-                let query = {
-                    "query" : {
-                        match_all: {}
-                      }
-                }
-                
-             let emails = await elasticOperation.searchDocuments(collection, query,sort);
-             let renderData = [];
-             emails.forEach((ele)=>{
-                renderData.push(ele._source)
-             })
-console.log("This is the email fetched using elastic seatch");
-                res.json(renderData)
-
-            })
-            .catch(error => {
-                console.log("Got an error while fetching mails: ", error)
-                next(error)
             });
+            mailData = mailData.concat(response.data.value);
+            nextLink = response.data['@odata.nextLink'] || null;
+        }
+
+        // Assign folders to emails
+        mailData = mailData.map(mail => {
+            const folder = mailFolders.find(f => f.id === mail.parentFolderId);
+            return { ...mail, Folder: folder ? folder.displayName : null };
+        });
+
+        // Prepare datasets for bulk upsert
+        const datasets = mailData.map(mail => ({
+            id: mail.id + mail.Folder + mail.receivedDateTime + mail.subject,
+            subject: mail.subject,
+            createdDateTime: mail.createdDateTime,
+            lastModifiedDateTime: mail.lastModifiedDateTime,
+            bodyPreview: mail.bodyPreview,
+            isRead: mail.isRead,
+            receivedDateTime: mail.receivedDateTime,
+            from: mail.from.emailAddress.address,
+            name: mail.from.emailAddress.name,
+            folder: mail.Folder
+        }));
+
+        // Bulk upsert email data into Elasticsearch
+        await elasticOperation.bulkUpsert('mails', datasets);
+
+        // Fetch all emails from Elasticsearch
+        const emails = await elasticOperation.searchDocuments('mails', {
+            query: { match_all: {} }
+        }, [
+            { receivedDateTime: { order: "asc" } }
+        ]);
+
+        const renderData = emails.map(email => email._source);
+        console.log("This is the email fetched using Elasticsearch");
+        res.json(renderData);
     } catch (error) {
-        console.log("Got an error while fetching mails: ", error)
-        next(error)
+        console.log("Got an error while fetching mails:", error);
+        next(error);
     }
 });
-// Route to handle errors
+
+// Error handling route
 app.get('/error', (req, res) => {
     res.status(500).send('An error occurred while processing your request.');
 });
 
+// Fetch user information from Elasticsearch
+app.get('/fetchUserInfo', async (req, res, next) => {
+    try {
+        const user = await elasticOperation.searchDocuments('user_details', { query: { match_all: {} } });
+        const userData = {
+            name: user[0]._source.user.displayName,
+            email: user[0]._source.user.mail
+        };
+        res.json(userData);
+    } catch (error) {
+        console.log("Got error in finding userData", error);
+        next(error);
+    }
+});
+
 app.listen(port, () => {
-    console.log(`Server running on PORT :${port}`);
+    console.log(`Server running on PORT: ${port}`);
 });

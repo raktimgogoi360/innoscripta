@@ -1,28 +1,42 @@
-version: '3.8'
+version: '3.9'
 
 services:
-  mongo:
-    image: mongo:4.4
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.14.1
+    environment:
+      - discovery.type=single-node
+      - xpack.security.enabled=false
     ports:
-      - "27017:27017"
+      - '9200:9200'
     volumes:
-      - mongo-data:/data/db
-
+      - esdata:/usr/share/elasticsearch/data
+    networks:
+      - my_network
   app:
     build: .
-    container_name: nodejs-app
+    container_name: node_app
     ports:
-      - "3000:3000"
+      - '3000:3000'
     environment:
-      - MONGO_URI=mongodb://mongo:27017
-      - CLIENT_SECRET=9.28Q~Qsustb-Z-NJBXLr1qGBW.uLa.A~Pa8naOS
+      - PORT=3000
       - CLIENT_ID=25ee1fc1-3379-4148-ab39-c4c24688d158
+      - CLIENT_SECRET=9.28Q~Qsustb-Z-NJBXLr1qGBW.uLa.A~Pa8naOS
       - TENANT_ID=150c22a5-d8bb-4616-aac7-65d9aa780839
       - REDIRECT_URI=http://localhost:3000/auth/outlook/callback
-    depends_on:
-      - mongo
+      - ELASTIC_SEARCH_URI=http://elasticsearch:9200
     volumes:
       - .:/usr/src/app
+    depends_on:
+      - elasticsearch
+    networks:
+      - my_network  # Added this line
+
+ 
+
+networks:
+  my_network:
+    driver: bridge
 
 volumes:
-  mongo-data:
+  esdata:
+    driver: local
