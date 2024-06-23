@@ -156,7 +156,7 @@ app.get('/fetchMails', async (req, res, next) => {
 
         // Prepare datasets for bulk upsert
         const datasets = mailData.map(mail => ({
-            id: mail.id + mail.Folder + mail.receivedDateTime + mail.subject,
+            id: mail.id+ mail.receivedDateTime + mail.subject,
             subject: mail.subject,
             createdDateTime: mail.createdDateTime,
             lastModifiedDateTime: mail.lastModifiedDateTime,

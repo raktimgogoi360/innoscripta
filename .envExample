@@ -2,12 +2,6 @@ ENVIRONMENT = DEV
 BASE_URL = https://localhost:3000
 PORT =3000
 
-######MONGO DB CREDS#############
-MONGO_URI = mongodb://localhost:27017
-MONGO_AUTH = true
-MONGO_USERNAME = null
-MONGO_PASSWORD = null
-
 ###################ElasticSearch Details ################
 ELASTIC_SEARCH_URI = http://elasticsearch:9200
 #http://elastic:admin@123@elasticsearch:9200
