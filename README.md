@@ -110,7 +110,7 @@ REDIRECT_URI= http://localhost:3000/auth/outlook/callback
 
 
 
-# Happy coding !!! Fell free to reachout to me in case of any queries at `raktimgogoi360@gmail.com`
+# Happy coding !!! Feel free to reach out to me in case of any queries at `raktimgogoi360@gmail.com`
 
 
 
