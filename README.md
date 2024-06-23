@@ -3,7 +3,7 @@
 ## Prerequisites
 
 - **Node.js**: Ensure you have Node.js installed. You can download it from [Node.js official site](https://nodejs.org/).   (**VERSION 16 is required to run this project**)
-- **ElasticSearch**: Ensure you have ElasticSearch installed and running if running from local system.
+- **ElasticSearch**: Ensure you have ElasticSearch installed and running if running from local system. (https://www.elastic.co/downloads/elasticsearch)
 - **Azure Subscription**: You need an Azure subscription to set up Azure Active Directory.
 
 ### Clone this project innoscripta.
